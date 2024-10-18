@@ -27,7 +27,8 @@ def generate_token(db, user):
         db.commit()
         db.refresh(existing_token)
     else:
-        token_obj = TokenModel(user_id=user.id, token=token,
+        token_obj = TokenModel(user_id=user.id, 
+                               token=token,
                                expiration_date=expiration_time)
         db.add(token_obj)
         db.commit()
@@ -41,7 +42,9 @@ def generate_access_token(payload):
         "exp": datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_EXPIRATION),
 
     })
-    return jwt.encode(payload, settings.SECRET_KEY, "HS256")
+    return jwt.encode(payload,
+                      settings.SECRET_KEY, 
+                      "HS256")
 
 
 def generate_refresh_token(payload):
@@ -49,7 +52,9 @@ def generate_refresh_token(payload):
         "token_type": "refresh",
         "exp": datetime.now(timezone.utc) + timedelta(minutes=settings.REFRESH_EXPIRATION),
     })
-    return jwt.encode(payload, settings.SECRET_KEY, "HS256")
+    return jwt.encode(payload, 
+                      settings.SECRET_KEY,
+                      "HS256")
 
 
 def generate_jwt_tokens(user):

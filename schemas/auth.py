@@ -19,3 +19,4 @@ class LoginResponseSchema(BaseModel):
 class LoginRequestSchema(BaseModel):
     username: str
     password: str
+
