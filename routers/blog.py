@@ -17,7 +17,7 @@ router =  APIRouter(prefix="/api/v1",
 async def names_list(user : bool = Depends(TokenBearer()),
                      search : Optional[str] = Query(None, description = "searching names"),
                      db:Session = Depends(get_db)):
-    print("user_token",user.username)
+    # print("user_token",user.username)
     return db.query(StudentModel).all()
 
 
