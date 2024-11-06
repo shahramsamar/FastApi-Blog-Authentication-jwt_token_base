@@ -11,6 +11,38 @@ from datetime import datetime
 
 router = APIRouter(prefix="/api/v1", tags=["Authenticate with jwt"])
 
+def create_user(request: LoginRequestSchema,
+                db: Session = Depends(get_db)):
+    user = UserModel(username=request.username, 
+                     password=request.password)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+@router.post("/create-user-account",
+             response_model=LoginResponseSchema,
+             status_code=status.HTTP_201_CREATED)
+def create_user_and_generate_tokens(request : LoginRequestSchema,
+                                    db : Session = Depends(get_db)):
+    existing_user = db.query(UserModel).filter(UserModel.username == request.username).first()
+    if existing_user:
+        raise HTTPException(status_code=400, 
+                            detail="Username already taken")
+    
+    # Create the user
+    user = create_user(request, db)
+    
+    # Generate JWT tokens for the user
+    jwt_tokens = generate_jwt_tokens(user)
+    
+    # Return user details and tokens
+    return {
+        "detail": "User account successfully created",
+        "access_token": jwt_tokens["access_token"],
+        "refresh_token": jwt_tokens["refresh_token"],
+        "user_id": user.id
+    }
 
 @router.post("/login", 
              response_model=LoginResponseSchema, 
